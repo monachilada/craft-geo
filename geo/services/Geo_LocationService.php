@@ -8,8 +8,14 @@ class Geo_LocationService extends BaseApplicationComponent
 		$default = <<<EOD
 {"ip":"203.59.25.206","country_code":"","country_name":"","region_code":"","region_name":"","city":"","zipcode":"","latitude":"","longitude":"","metro_code":"","areacode":"","currency":""}
 EOD;
-		$cache = craft()->path->getStoragePath().'geo/'.$ip;
-		if(file_exists($cache) && filemtime($cache) < time() - (60 * 60 * 24)) {
+		$path = craft()->path->getStoragePath().'geo/';
+		$cache = $path.$ip;
+		
+		if(!is_dir($path)) {
+			mkdir($path);
+		}
+		
+		if(file_exists($cache) && filemtime($cache) > time() - (60 * 60 * 24)) {
 			return json_decode(file_get_contents($cache));
 		}
 		
@@ -284,6 +290,6 @@ EOD;
 			"RD" => "EUR"
 		);
 		
-		return (isset($countries[$countries]))? $countries[$countries]: null;
+		return (isset($countries[$countryCode]))? $countries[$countryCode]: null;
     }
 }
