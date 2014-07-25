@@ -286,7 +286,6 @@ EOD;
 			"MF" => "ANG",
 			"PM" => "EUR",
 			"RS" => "RSD",
-			"USAF" => "USD",
 			"RD" => "EUR"
 		);
 		
