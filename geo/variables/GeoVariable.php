@@ -8,8 +8,8 @@ class GeoVariable
         return craft()->geo_location->getInfo($_SERVER['REMOTE_ADDR']);
     }
     
-    public function countries() {
-	    return array(
+    public function countries($numindex = false) {
+	    $countries = array(
 			"AF" => "Afghanistan",
 			"AL" => "Albania",
 			"DZ" => "Algeria",
@@ -275,5 +275,7 @@ class GeoVariable
 			"ZW" => "Zimbabwe",
 			"AX" => "Åland Islands",
 		);
+		
+		return ($numindex)? array_values($countries): $countries;
     }
 }
