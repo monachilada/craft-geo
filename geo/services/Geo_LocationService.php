@@ -6,7 +6,7 @@ class Geo_LocationService extends BaseApplicationComponent
     public function getInfo($ip)
     {
 		$default = <<<EOD
-{"ip":"203.59.25.206","country_code":"","country_name":"","region_code":"","region_name":"","city":"","zipcode":"","latitude":"","longitude":"","metro_code":"","areacode":"","currency":"EUR"}
+{"ip":"127.0.0.1","country_code":"","country_name":"","region_code":"","region_name":"","city":"","zipcode":"","latitude":"","longitude":"","metro_code":"","areacode":"","currency":"EUR"}
 EOD;
 		$path = craft()->path->getStoragePath().'geo/';
 		$cache = $path.$ip;
@@ -34,8 +34,6 @@ EOD;
 		        	file_put_contents($cache, json_encode($result));
 		        	
 		        	return $result;
-		        } else {
-		        	return json_decode($default);
 		        }
 			} catch (\Guzzle\Http\Exception\RequestException $e) {
 				file_put_contents($error, $e->getRequest());
