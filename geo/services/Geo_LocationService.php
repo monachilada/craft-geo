@@ -6,10 +6,11 @@ class Geo_LocationService extends BaseApplicationComponent
     public function getInfo($ip)
     {
 		$default = <<<EOD
-{"ip":"203.59.25.206","country_code":"","country_name":"","region_code":"","region_name":"","city":"","zipcode":"","latitude":"","longitude":"","metro_code":"","areacode":"","currency":""}
+{"ip":"203.59.25.206","country_code":"","country_name":"","region_code":"","region_name":"","city":"","zipcode":"","latitude":"","longitude":"","metro_code":"","areacode":"","currency":"EUR"}
 EOD;
 		$path = craft()->path->getStoragePath().'geo/';
 		$cache = $path.$ip;
+		$error = $path.'NetworkError';
 		
 		if(!is_dir($path)) {
 			mkdir($path);
@@ -19,19 +20,27 @@ EOD;
 			return json_decode(file_get_contents($cache));
 		}
 		
+		$client = new \Guzzle\Http\Client();
 		$url = "http://freegeoip.net/json/".$ip;
-        $client = new \Guzzle\Http\Client();
         
-        $request = $client->get($url, ['future' => true]);
-        
-        $request->then(
-	        function ($response) {
-	            $result = json_decode($response->getBody());        	
-	        	$result->currency = $this->_getCurrency($result->country_code);
-	        	
-	        	file_put_contents($cache, json_encode($result));
-	        }
-	    );
+        if(!file_exists($error) || filemtime($error) < time() - (60 * 60)) {
+	        try {
+			    $response = $client->get($url)->send();
+			    
+			    if ($response->isSuccessful()) {
+		        	$result = json_decode($response->getBody());        	
+		        	$result->currency = $this->_getCurrency($result->country_code);
+		        	
+		        	file_put_contents($cache, json_encode($result));
+		        	
+		        	return $result;
+		        } else {
+		        	return json_decode($default);
+		        }
+			} catch (\Guzzle\Http\Exception\RequestException $e) {
+				file_put_contents($error, $e->getRequest());
+			}
+		}
 		
 		return json_decode($default);
     }
