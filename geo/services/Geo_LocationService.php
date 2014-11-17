@@ -1,9 +1,6 @@
 <?php
 namespace Craft;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-
 class Geo_LocationService extends BaseApplicationComponent
 {
     public function getInfo($ip)
@@ -23,7 +20,7 @@ EOD;
 		}
 		
 		$url = "http://freegeoip.net/json/".$ip;
-        $client = new Client();
+        $client = new \Guzzle\Http\Client();
         
         $request = $client->get($url, ['future' => true]);
         
