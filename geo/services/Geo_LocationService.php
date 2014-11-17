@@ -34,7 +34,7 @@ EOD;
 	        	
 	        	file_put_contents($cache, json_encode($result));
 	        }
-	    )
+	    );
 		
 		return json_decode($default);
     }
