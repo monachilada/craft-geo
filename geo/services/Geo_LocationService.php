@@ -1,6 +1,7 @@
 <?php
 namespace Craft;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
 class Geo_LocationService extends BaseApplicationComponent
@@ -21,24 +22,21 @@ EOD;
 			return json_decode(file_get_contents($cache));
 		}
 		
-		$url = "/json/".$ip;
-        $client = new \Guzzle\Http\Client("http://freegeoip.net");
+		$url = "http://freegeoip.net/json/".$ip;
+        $client = new Client();
         
-        try {
-		    $response = $client->get($url)->send();
-		    if ($response->isSuccessful()) {
-	        	$result = json_decode($response->getBody());        	
+        $request = $client->get($url, ['future' => true]);
+        
+        $request->then(
+	        function ($response) {
+	            $result = json_decode($response->getBody());        	
 	        	$result->currency = $this->_getCurrency($result->country_code);
 	        	
 	        	file_put_contents($cache, json_encode($result));
-	        	
-	        	return $result;
-	        } else {
-	        	return json_decode($default);
 	        }
-		} catch (RequestException $e) {
-		    return json_decode($default);
-		}
+	    )
+		
+		return json_decode($default);
     }
     
     public function _getCurrency($countryCode) {
